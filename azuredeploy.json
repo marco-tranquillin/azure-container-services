@@ -1,0 +1,772 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      
+  },
+  "variables": {
+    "alias": "mrtranqui",
+
+    "MesosLocation": "westus",
+
+    "MesosVNPrefix": "192.168.0.0/16",
+
+    "MesosVNSubnetMasterName": "MesosMasterSubNet",
+    "MesosVNSubnetMasterPrefix": "192.168.1.0/29",
+    "MesosVNSubnetSlaveName": "MesosSlaveSubNet",
+    "MesosVNSubnetSlavePrefix": "192.168.2.0/29",
+
+    "MesosMasterASName": "MesosMasterAS",
+    "MesosSlaveASName": "MesosSlaveAS",
+
+    "MesosMaster-1-NICName": "MesosMaster-1-NIC",
+    "MesosMaster-1-IPconfigName": "MesosMaster-1-IPconfig",
+    "MesosMaster-1-NIC-PrivateIPaddress": "192.168.1.4",
+    "MesosMaster-1-NICVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosMaster-1-NICSubnetRef": "[concat(variables('MesosMaster-1-NICVnetID'), '/subnets/', variables('MesosVNSubnetMasterName'))]",
+
+    "MesosMaster-1-NIC-PublicIP": "MesosMaster-1-PIP",
+    "MesosMaster-1-NIC-PublicIPdomain": "mesosmaster1pip",
+
+    "MesosMaster-2-NICName": "MesosMaster-2-NIC",
+    "MesosMaster-2-IPconfigName": "MesosMaster-2-IPconfig",
+    "MesosMaster-2-NIC-PrivateIPaddress": "192.168.1.5",
+    "MesosMaster-2-NICVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosMaster-2-NICSubnetRef": "[concat(variables('MesosMaster-2-NICVnetID'), '/subnets/', variables('MesosVNSubnetMasterName'))]",
+
+    "MesosMaster-2-NIC-PublicIP": "MesosMaster-2-PIP",
+    "MesosMaster-2-NIC-PublicIPdomain": "mesosmaster2pip",
+
+    "MesosMaster-3-NICName": "MesosMaster-3-NIC",
+    "MesosMaster-3-IPconfigName": "MesosMaster-3-IPconfig",
+    "MesosMaster-3-NIC-PrivateIPaddress": "192.168.1.6",
+    "MesosMaster-3-NICVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosMaster-3-NICSubnetRef": "[concat(variables('MesosMaster-3-NICVnetID'), '/subnets/', variables('MesosVNSubnetMasterName'))]",
+
+    "MesosMaster-3-NIC-PublicIP": "MesosMaster-3-NIC",
+    "MesosMaster-3-NIC-PublicIPdomain": "mesosmaster3pip",
+
+    "MesosSlave-1-NICName": "MesosSlave-1-NIC",
+    "MesosSlave-1-IPconfigName": "MesosSlave-1-IPconfig",
+    "MesosSlave-1-NIC-PrivateIPaddress": "192.168.2.4",
+    "MesosSlave-1-NICVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosSlave-1-NICSubnetRef": "[concat(variables('MesosSlave-1-NICVnetID'), '/subnets/', variables('MesosVNSubnetSlaveName'))]",
+
+    "MesosSlave-1-NIC-PublicIP": "MesosSlave-1-PIP",
+    "MesosSlave-1-NIC-PublicIPdomain": "mesosslave1pip",
+
+    "MesosSlave-2-NICName": "MesosSlave-2-NIC",
+    "MesosSlave-2-IPconfigName": "MesosSlave-2-IPconfig",
+    "MesosSlave-2-NIC-PrivateIPaddress": "192.168.2.5",
+    "MesosSlave-2-NICVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosSlave-2-NICSubnetRef": "[concat(variables('MesosSlave-2-NICVnetID'), '/subnets/', variables('MesosVNSubnetSlaveName'))]",
+
+    "MesosSlave-2-NIC-PublicIP": "MesosSlave-2-PIP",
+    "MesosSlave-2-NIC-PublicIPdomain": "mesosslave2pip",
+
+    "MesosSlave-3-NICName": "MesosSlave-3-NIC",
+    "MesosSlave-3-IPconfigName": "MesosSlave-3-IPconfig",
+    "MesosSlave-3-NIC-PrivateIPaddress": "192.168.2.6",
+    "MesosSlave-3-NICVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosSlave-3-NICSubnetRef": "[concat(variables('MesosSlave-3-NICVnetID'), '/subnets/', variables('MesosVNSubnetSlaveName'))]",
+
+    "MesosSlave-3-NIC-PublicIP": "MesosSlave-3-PIP",
+    "MesosSlave-3-NIC-PublicIPdomain": "mesosslave3pip",
+
+    "MesosSAname": "mesossa",
+    "MesosSAtype": "Standard_LRS",
+
+    "MesosMaster-1-VM-Name": "MesosMaster-1",
+    "MesosMaster-1-VM-Size": "Basic_A0",
+    "MesosMaster-1-VM-ImagePublisher": "credativ",
+    "MesosMaster-1-VM-ImageOffer": "Debian",
+    "MesosMaster-1-VM-ImageSKU": "8",
+    "MesosMaster-1-VM-OSDiskName": "OS-MesosMaster-1.vhd",
+    "MesosMaster-1-VM-VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosMaster-1-VM-SubnetRef": "[concat(variables('MesosMaster-1-VM-VnetID'), '/subnets/', variables('MesosVNSubnetMasterName'))]",
+    "MesosMaster-1-VM-StorageAccountContainerName": "vhds",
+    "MesosMaster-1-VM-AdminUsername": "MesosMaster1",
+    "MesosMaster-1-VM-AdminPassword": "@MesosMaster1",
+
+    "MesosMaster-2-VM-Name": "MesosMaster-2",
+    "MesosMaster-2-VM-Size": "Basic_A0",
+    "MesosMaster-2-VM-ImagePublisher": "credativ",
+    "MesosMaster-2-VM-ImageOffer": "Debian",
+    "MesosMaster-2-VM-ImageSKU": "8",
+    "MesosMaster-2-VM-OSDiskName": "OS-MesosMaster-2.vhd",
+    "MesosMaster-2-VM-VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosMaster-2-VM-SubnetRef": "[concat(variables('MesosMaster-2-VM-VnetID'), '/subnets/', variables('MesosVNSubnetMasterName'))]",
+    "MesosMaster-2-VM-StorageAccountContainerName": "vhds",
+    "MesosMaster-2-VM-AdminUsername": "MesosMaster2",
+    "MesosMaster-2-VM-AdminPassword": "@MesosMaster2",
+
+    "MesosMaster-3-VM-Name": "MesosMaster-3",
+    "MesosMaster-3-VM-Size": "Basic_A0",
+    "MesosMaster-3-VM-ImagePublisher": "credativ",
+    "MesosMaster-3-VM-ImageOffer": "Debian",
+    "MesosMaster-3-VM-ImageSKU": "8",
+    "MesosMaster-3-VM-OSDiskName": "OS-MesosMaster-3.vhd",
+    "MesosMaster-3-VM-VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosMaster-3-VM-SubnetRef": "[concat(variables('MesosMaster-3-VM-VnetID'), '/subnets/', variables('MesosVNSubnetMasterName'))]",
+    "MesosMaster-3-VM-StorageAccountContainerName": "vhds",
+    "MesosMaster-3-VM-AdminUsername": "MesosMaster3",
+    "MesosMaster-3-VM-AdminPassword": "@MesosMaster3",
+
+    "MesosSlave-1-VM-Name": "MesosSlave-1",
+    "MesosSlave-1-VM-Size": "Basic_A0",
+    "MesosSlave-1-VM-ImagePublisher": "credativ",
+    "MesosSlave-1-VM-ImageOffer": "Debian",
+    "MesosSlave-1-VM-ImageSKU": "8",
+    "MesosSlave-1-VM-OSDiskName": "OS-MesosSlave-1.vhd",
+    "MesosSlave-1-VM-VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosSlave-1-VM-SubnetRef": "[concat(variables('MesosSlave-1-VM-VnetID'), '/subnets/', variables('MesosVNSubnetMasterName'))]",
+    "MesosSlave-1-VM-StorageAccountContainerName": "vhds",
+    "MesosSlave-1-VM-AdminUsername": "MesosSlave1",
+    "MesosSlave-1-VM-AdminPassword": "@MesosSlave1",
+
+    "MesosSlave-2-VM-Name": "MesosSlave-2",
+    "MesosSlave-2-VM-Size": "Basic_A0",
+    "MesosSlave-2-VM-ImagePublisher": "credativ",
+    "MesosSlave-2-VM-ImageOffer": "Debian",
+    "MesosSlave-2-VM-ImageSKU": "8",
+    "MesosSlave-2-VM-OSDiskName": "OS-MesosSlave-2.vhd",
+    "MesosSlave-2-VM-VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosSlave-2-VM-SubnetRef": "[concat(variables('MesosSlave-2-VM-VnetID'), '/subnets/', variables('MesosVNSubnetMasterName'))]",
+    "MesosSlave-2-VM-StorageAccountContainerName": "vhds",
+    "MesosSlave-2-VM-AdminUsername": "MesosSlave2",
+    "MesosSlave-2-VM-AdminPassword": "@MesosSlave2",
+
+    "MesosSlave-3-VM-Name": "MesosSlave-3",
+    "MesosSlave-3-VM-Size": "Basic_A0",
+    "MesosSlave-3-VM-ImagePublisher": "credativ",
+    "MesosSlave-3-VM-ImageOffer": "Debian",
+    "MesosSlave-3-VM-ImageSKU": "8",
+    "MesosSlave-3-VM-OSDiskName": "OS-MesosSlave-3.vhd",
+    "MesosSlave-3-VM-VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'MesosVN')]",
+    "MesosSlave-3-VM-SubnetRef": "[concat(variables('MesosSlave-3-VM-VnetID'), '/subnets/', variables('MesosVNSubnetMasterName'))]",
+    "MesosSlave-3-VM-StorageAccountContainerName": "vhds",
+    "MesosSlave-3-VM-AdminUsername": "MesosSlave3",
+    "MesosSlave-3-VM-AdminPassword": "@MesosSlave3"
+
+  },
+  "resources": [
+    {
+      "name": "MesosVN",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "MesosVN"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('MesosVNPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('MesosVNSubnetMasterName')]",
+            "properties": {
+              "addressPrefix": "[variables('MesosVNSubnetMasterPrefix')]"
+            }
+          },
+          {
+            "name": "[variables('MesosVNSubnetSlaveName')]",
+            "properties": {
+              "addressPrefix": "[variables('MesosVNSubnetSlavePrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "location": "[variables('MesosLocation')]",
+      "name": "[variables('MesosMasterASName')]",
+      "tags": {
+        "displayName": "MesosMasterAS"
+      },
+      "type": "Microsoft.Compute/availabilitySets"
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "location": "[variables('MesosLocation')]",
+      "name": "[variables('MesosSlaveASName')]",
+      "tags": {
+        "displayName": "MesosSlaveAS"
+      },
+      "type": "Microsoft.Compute/availabilitySets"
+    },
+    {
+      "name": "[variables('MesosMaster-1-NICName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', 'MesosVN')]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('MesosMaster-1-NIC-PublicIP'))]"
+      ],
+      "tags": {
+        "displayName": "MesosMaster-1-NIC"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[variables('MesosMaster-1-IPconfigName')]",
+            "properties": {
+              "privateIPAddress": "[variables('MesosMaster-1-NIC-PrivateIPaddress')]",
+              "privateIPAllocationMethod": "Static",
+              "subnet": {
+                "id": "[variables('MesosMaster-1-NICSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('MesosMaster-1-NIC-PublicIP'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('MesosMaster-2-NICName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', 'MesosVN')]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('MesosMaster-2-NIC-PublicIP'))]"
+      ],
+      "tags": {
+        "displayName": "MesosMaster-2-NIC"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[variables('MesosMaster-2-IPconfigName')]",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "subnet": {
+                "id": "[variables('MesosMaster-2-NICSubnetRef')]"
+              },
+              "privateIPAddress": "[variables('MesosMaster-2-NIC-PrivateIPaddress')]",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('MesosMaster-2-NIC-PublicIP'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('MesosMaster-3-NICName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', 'MesosVN')]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('MesosMaster-3-NIC-PublicIP'))]"
+      ],
+      "tags": {
+        "displayName": "MesosMaster-3-NIC"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[variables('MesosMaster-3-IPconfigName')]",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "subnet": {
+                "id": "[variables('MesosMaster-3-NICSubnetRef')]"
+              },
+              "privateIPAddress": "[variables('MesosMaster-3-NIC-PrivateIPaddress')]",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('MesosMaster-3-NIC-PublicIP'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('MesosSlave-1-NICName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', 'MesosVN')]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('MesosSlave-1-NIC-PublicIP'))]"
+      ],
+      "tags": {
+        "displayName": "MesosSlave-1-NIC"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[variables('MesosSlave-1-IPconfigName')]",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "subnet": {
+                "id": "[variables('MesosSlave-1-NICSubnetRef')]"
+              },
+              "privateIPAddress": "[variables('MesosSlave-1-NIC-PrivateIPaddress')]",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('MesosSlave-1-NIC-PublicIP'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('MesosSlave-2-NICName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', 'MesosVN')]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('MesosSlave-2-NIC-PublicIP'))]"
+      ],
+      "tags": {
+        "displayName": "MesosSlave-2-NIC"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[variables('MesosSlave-2-IPconfigName')]",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "subnet": {
+                "id": "[variables('MesosSlave-2-NICSubnetRef')]"
+              },
+              "privateIPAddress": "[variables('MesosSlave-2-NIC-PrivateIPaddress')]",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('MesosSlave-2-NIC-PublicIP'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('MesosSlave-3-NICName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', 'MesosVN')]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('MesosSlave-3-NIC-PublicIP'))]"
+      ],
+      "tags": {
+        "displayName": "MesosSlave-3-NIC"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[variables('MesosSlave-3-IPconfigName')]",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "subnet": {
+                "id": "[variables('MesosSlave-3-NICSubnetRef')]"
+              },
+              "privateIPAddress": "[variables('MesosSlave-3-NIC-PrivateIPaddress')]",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('MesosSlave-3-NIC-PublicIP'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('MesosMaster-1-NIC-PublicIP')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "MesosMaster-1-PIP"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(variables('alias'),'-',variables('MesosMaster-1-NIC-PublicIPdomain'))]"
+        }
+      }
+    },
+    {
+      "name": "[variables('MesosMaster-2-NIC-PublicIP')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "MesosMaster-2-PIP"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(variables('alias'),'-',variables('MesosMaster-2-NIC-PublicIPdomain'))]"
+        }
+      }
+    },
+    {
+      "name": "[variables('MesosMaster-3-NIC-PublicIP')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "MesosMaster-3-PIP"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(variables('alias'),'-',variables('MesosMaster-3-NIC-PublicIPdomain'))]"
+        }
+      }
+    },
+    {
+      "name": "[variables('MesosSlave-1-NIC-PublicIP')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "MesosSlave-1-PIP"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(variables('alias'),'-',variables('MesosSlave-1-NIC-PublicIPdomain'))]"
+        }
+      }
+    },
+    {
+      "name": "[variables('MesosSlave-2-NIC-PublicIP')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "MesosSlave-2-PIP"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(variables('alias'),'-',variables('MesosSlave-2-NIC-PublicIPdomain'))]"
+        }
+      }
+    },
+    {
+      "name": "[variables('MesosSlave-3-NIC-PublicIP')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "MesosSlave-3-PIP"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(variables('alias'),'-',variables('MesosSlave-3-NIC-PublicIPdomain'))]"
+        }
+      }
+    },
+    {
+      "name": "[concat(variables('alias'),variables('MesosSAname'))]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "MesosSA"
+      },
+      "properties": {
+        "accountType": "[variables('MesosSAtype')]"
+      }
+    },
+    {
+      "name": "[variables('MesosMaster-1-VM-Name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', concat(variables('alias'),variables('MesosSAname')))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('MesosMaster-1-NICName'))]"
+      ],
+      "tags": {
+        "displayName": "MesosMaster-1"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('MesosMaster-1-VM-Size')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('MesosMaster-1-VM-Name')]",
+          "adminUsername": "[variables('MesosMaster-1-VM-AdminUsername')]",
+          "adminPassword": "[variables('MesosMaster-1-VM-AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('MesosMaster-1-VM-ImagePublisher')]",
+            "offer": "[variables('MesosMaster-1-VM-ImageOffer')]",
+            "sku": "[variables('MesosMaster-1-VM-ImageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "MesosMaster-1-VM-OSDisk",
+            "vhd": {
+              "uri": "[concat('http://', concat(variables('alias'),variables('MesosSAname')), '.blob.core.windows.net/', variables('MesosMaster-1-VM-StorageAccountContainerName'), '/', variables('MesosMaster-1-VM-OSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('MesosMaster-1-NICName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[variables('MesosMaster-2-VM-Name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', concat(variables('alias'),variables('MesosSAname')))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('MesosMaster-2-NICName'))]"
+      ],
+      "tags": {
+        "displayName": "MesosMaster-2"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('MesosMaster-2-VM-Size')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('MesosMaster-2-VM-Name')]",
+          "adminUsername": "[variables('MesosMaster-2-VM-AdminUsername')]",
+          "adminPassword": "[variables('MesosMaster-2-VM-AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('MesosMaster-2-VM-ImagePublisher')]",
+            "offer": "[variables('MesosMaster-2-VM-ImageOffer')]",
+            "sku": "[variables('MesosMaster-2-VM-ImageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "MesosMaster-2-VM-OSDisk",
+            "vhd": {
+              "uri": "[concat('http://', concat(variables('alias'),variables('MesosSAname')), '.blob.core.windows.net/', variables('MesosMaster-2-VM-StorageAccountContainerName'), '/', variables('MesosMaster-2-VM-OSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('MesosMaster-2-NICName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[variables('MesosMaster-3-VM-Name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', concat(variables('alias'),variables('MesosSAname')))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('MesosMaster-3-NICName'))]"
+      ],
+      "tags": {
+        "displayName": "MesosMaster-3"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('MesosMaster-3-VM-Size')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('MesosMaster-3-VM-Name')]",
+          "adminUsername": "[variables('MesosMaster-3-VM-AdminUsername')]",
+          "adminPassword": "[variables('MesosMaster-3-VM-AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('MesosMaster-3-VM-ImagePublisher')]",
+            "offer": "[variables('MesosMaster-3-VM-ImageOffer')]",
+            "sku": "[variables('MesosMaster-3-VM-ImageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "MesosMaster-3-VM-OSDisk",
+            "vhd": {
+              "uri": "[concat('http://', concat(variables('alias'),variables('MesosSAname')), '.blob.core.windows.net/', variables('MesosMaster-3-VM-StorageAccountContainerName'), '/', variables('MesosMaster-3-VM-OSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('MesosMaster-3-NICName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[variables('MesosSlave-1-VM-Name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', concat(variables('alias'),variables('MesosSAname')))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('MesosSlave-1-NICName'))]"
+      ],
+      "tags": {
+        "displayName": "MesosSlave-1"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('MesosSlave-1-VM-Size')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('MesosSlave-1-VM-Name')]",
+          "adminUsername": "[variables('MesosSlave-1-VM-AdminUsername')]",
+          "adminPassword": "[variables('MesosSlave-1-VM-AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('MesosSlave-1-VM-ImagePublisher')]",
+            "offer": "[variables('MesosSlave-1-VM-ImageOffer')]",
+            "sku": "[variables('MesosSlave-1-VM-ImageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "MesosSlave-1-VM-OSDisk",
+            "vhd": {
+              "uri": "[concat('http://', concat(variables('alias'),variables('MesosSAname')), '.blob.core.windows.net/', variables('MesosSlave-1-VM-StorageAccountContainerName'), '/', variables('MesosSlave-1-VM-OSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('MesosSlave-1-NICName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[variables('MesosSlave-2-VM-Name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', concat(variables('alias'),variables('MesosSAname')))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('MesosSlave-2-NICName'))]"
+      ],
+      "tags": {
+        "displayName": "MesosSlave-2"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('MesosSlave-2-VM-Size')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('MesosSlave-2-VM-Name')]",
+          "adminUsername": "[variables('MesosSlave-2-VM-AdminUsername')]",
+          "adminPassword": "[variables('MesosSlave-2-VM-AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('MesosSlave-2-VM-ImagePublisher')]",
+            "offer": "[variables('MesosSlave-2-VM-ImageOffer')]",
+            "sku": "[variables('MesosSlave-2-VM-ImageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "MesosSlave-2-VM-OSDisk",
+            "vhd": {
+              "uri": "[concat('http://', concat(variables('alias'),variables('MesosSAname')), '.blob.core.windows.net/', variables('MesosSlave-2-VM-StorageAccountContainerName'), '/', variables('MesosSlave-2-VM-OSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('MesosSlave-2-NICName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[variables('MesosSlave-3-VM-Name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[variables('MesosLocation')]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', concat(variables('alias'),variables('MesosSAname')))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('MesosSlave-3-NICName'))]"
+      ],
+      "tags": {
+        "displayName": "MesosSlave-3"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('MesosSlave-3-VM-Size')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('MesosSlave-3-VM-Name')]",
+          "adminUsername": "[variables('MesosSlave-3-VM-AdminUsername')]",
+          "adminPassword": "[variables('MesosSlave-3-VM-AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('MesosSlave-3-VM-ImagePublisher')]",
+            "offer": "[variables('MesosSlave-3-VM-ImageOffer')]",
+            "sku": "[variables('MesosSlave-3-VM-ImageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "MesosSlave-3-VM-OSDisk",
+            "vhd": {
+              "uri": "[concat('http://', concat(variables('alias'),variables('MesosSAname')), '.blob.core.windows.net/', variables('MesosSlave-3-VM-StorageAccountContainerName'), '/', variables('MesosSlave-3-VM-OSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('MesosSlave-3-NICName'))]"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+  }
+}
